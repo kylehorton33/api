@@ -1,8 +1,7 @@
 const express = require("express");
-const app = express();
-require("dotenv").config();
-const pool = require("./db");
+const { getUsers } = require("./db/queries");
 
+const app = express();
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -12,7 +11,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/users", async(req, res) => {
-    const users = await pool.query("SELECT * FROM users");
+    const users = await getUsers();
     res.json(users.rows);
 });
 
