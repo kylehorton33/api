@@ -6,7 +6,11 @@ const app = express();
 app.use(express.json());
 
 app.get("/", main.welcomeMessage);
-app.get("/users", auth.getUsers);
+
+app.post("/users", auth.createUser);
+app.get("/users", auth.getAllUsers);
+app.get("/user/:id", auth.getOneUser);
+app.put("/user/:id", auth.updateUser);
 
 app.listen(5000, () => {
     console.log("The server has started at http://localhost:5000");
