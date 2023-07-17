@@ -10,6 +10,18 @@ function createUserToken(user) {
     return jwt.sign(payload, process.env.JWT_SECRET);
 }
 
+const isValidUser = (req, res, next) => {
+    let token, decoded;
+    try {
+        token = req.headers.authorization.split(' ')[1];
+        decoded = jwt.verify(token, process.env.JWT_SECRET)
+        console.log(decoded)
+        next()
+    } catch {
+        return res.status(401).send({ error: "You must be logged in for this action " })
+    }
+}
+
 const checkSignupBody = [
     body("email")
     .isEmail().normalizeEmail({ all_lowercase: true }),
@@ -81,6 +93,7 @@ const updateUser = async(req, res) => {
 
 module.exports = {
     checkSignupBody,
+    isValidUser,
     createUser,
     getAllUsers,
     getOneUser,
