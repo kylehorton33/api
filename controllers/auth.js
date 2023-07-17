@@ -27,7 +27,7 @@ const checkSignupBody = [
 const createUser = async(req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.send({ errors: errors.array() });
+        return res.status(400).send({ errors: errors.array() });
     }
 
     const email = req.body.email;
@@ -36,13 +36,12 @@ const createUser = async(req, res, next) => {
     const userType = 1;
     const adminType = 0;
 
-    // Check if a user with the username already exists
+    // Check if a user with the username or email already exists
     let existingUser = null;
     try {
         existingUser = await pool.query("SELECT * FROM users WHERE username = $1 or email = $2", [username, email]);
     } catch (err) {
-        res.status(500).json({ "error": err.message });
-        next();
+        return res.status(500).json({ "error": err.message });
     }
 
     // If the user already exists, then return an error.
@@ -57,8 +56,7 @@ const createUser = async(req, res, next) => {
         hashedPassword = await bcrypt.hash(password, 10).then(hash => { return hash })
         newUser = await pool.query("INSERT INTO users (email, username, password, usertype, admintype) VALUES ($1, $2, $3, $4, $5) RETURNING *", [email, username, hashedPassword, userType, adminType]);
     } catch (err) {
-        res.status(500).send({ error: err.message });
-        next();
+        return res.status(500).send({ error: err.message });
     }
 
     // Use CreateUserToken function at the top of this file. Create a User JWT token and send it back as a response.
