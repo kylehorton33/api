@@ -10,19 +10,16 @@ function createUserToken(user) {
     return jwt.sign(payload, process.env.JWT_SECRET);
 }
 
-const checkBody = [
-    body("email").isEmail().normalizeEmail({ all_lowercase: true }),
+const checkSignupBody = [
+    body("email")
+    .isEmail().normalizeEmail({ all_lowercase: true }),
     body("username")
-    .not()
-    .isEmpty()
-    .trim()
-    .escape()
+    .not().isEmpty()
+    .trim().escape()
     .isLength({ min: 3, max: 15 }),
     body("password")
-    .not()
-    .isEmpty()
-    .trim()
-    .escape()
+    .not().isEmpty()
+    .trim().escape()
     .isLength({ min: 6, max: 30 }),
 ];
 
@@ -42,9 +39,7 @@ const createUser = async(req, res, next) => {
     // Check if a user with the username already exists
     let existingUser = null;
     try {
-        existingUser = await pool.query(
-            "SELECT * FROM users WHERE username = $1 or email = $2", [username, email]
-        );
+        existingUser = await pool.query("SELECT * FROM users WHERE username = $1 or email = $2", [username, email]);
     } catch (err) {
         res.status(500).json({ "error": err.message });
         next();
@@ -60,9 +55,7 @@ const createUser = async(req, res, next) => {
     let hashedPassword = null;
     try {
         hashedPassword = await bcrypt.hash(password, 10).then(hash => { return hash })
-        newUser = await pool.query(
-            "INSERT INTO users (email, username, password, usertype, admintype) VALUES ($1, $2, $3, $4, $5) RETURNING *", [email, username, hashedPassword, userType, adminType]
-        );
+        newUser = await pool.query("INSERT INTO users (email, username, password, usertype, admintype) VALUES ($1, $2, $3, $4, $5) RETURNING *", [email, username, hashedPassword, userType, adminType]);
     } catch (err) {
         res.status(500).send({ error: err.message });
         next();
@@ -74,9 +67,7 @@ const createUser = async(req, res, next) => {
 
 // return all users
 const getAllUsers = async(req, res) => {
-    const users = await pool.query(
-        "SELECT user_id, email, username, usertype, admintype FROM users"
-    );
+    const users = await pool.query("SELECT user_id, email, username, usertype, admintype FROM users");
     res.json(users.rows);
 };
 
@@ -91,7 +82,7 @@ const updateUser = async(req, res) => {
 };
 
 module.exports = {
-    checkBody,
+    checkSignupBody,
     createUser,
     getAllUsers,
     getOneUser,
