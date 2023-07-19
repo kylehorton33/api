@@ -79,7 +79,7 @@ const loginUser = async(req, res, next) => {
 }
 
 // create new user
-const createUser = async(req, res, next) => {
+const signupUser = async(req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).send({ errors: errors.array() });
@@ -137,7 +137,7 @@ const updateUser = async(req, res) => {
 module.exports = {
     checkSignupBody,
     isValidUser,
-    createUser,
+    signupUser,
     getAllUsers,
     getOneUser,
     updateUser,
