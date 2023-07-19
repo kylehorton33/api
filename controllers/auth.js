@@ -3,7 +3,6 @@ const pool = require("../db/config");
 const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { ResultWithContextImpl } = require("express-validator/src/chain");
 
 function createUserToken(user) {
     const timestamp = new Date().getTime();
