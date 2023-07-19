@@ -66,7 +66,7 @@ const createUser = async(req, res, next) => {
     let hashedPassword = null;
     try {
         hashedPassword = await bcrypt.hash(password, 10).then(hash => { return hash })
-        newUser = await pool.query("INSERT INTO users (email, username, password, usertype, admintype) VALUES ($1, $2, $3, $4, $5) RETURNING *", [email, username, hashedPassword, userType, adminType]);
+        newUser = await pool.query("INSERT INTO users (email, username, password_hash, usertype, admintype) VALUES ($1, $2, $3, $4, $5) RETURNING *", [email, username, hashedPassword, userType, adminType]);
     } catch (err) {
         return res.status(500).send({ error: err.message });
     }
