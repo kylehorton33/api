@@ -2,7 +2,8 @@ require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` });
 const pool = require("../db/config");
 const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const { ResultWithContextImpl } = require("express-validator/src/chain");
 
 function createUserToken(user) {
     const timestamp = new Date().getTime();
@@ -34,6 +35,49 @@ const checkSignupBody = [
     .trim().escape()
     .isLength({ min: 6, max: 30 }),
 ];
+
+const checkLoginBody = [
+    body("username")
+    .not().isEmpty(),
+    body("password")
+    .not().isEmpty()
+];
+
+const validateRequestBody = (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).send({ errors: errors.array() });
+    }
+}
+
+const loginUser = async(req, res, next) => {
+    // validate request body
+    validateRequestBody(req, res)
+
+    const username = req.body.username;
+    const password = req.body.password;
+
+    // check if user exists
+    let user = null;
+    try {
+        result = await pool.query("SELECT user_id, password_hash, admintype, usertype FROM users WHERE username = $1", [username]);
+        user = result.rows[0]
+    } catch (err) {
+        return res.status(500).json({ "error": err.message });
+    }
+    if (!user) {
+        return res.status(401).json({ error: "User does not exist" })
+    }
+
+    // check if password is valid
+    const match = await bcrypt.compare(password, user.password_hash)
+    if (match) {
+        let token = createUserToken(user)
+        return res.status(200).json({ token })
+    } else {
+        return res.status(401).json({ error: "Incorrect Password" })
+    }
+}
 
 // create new user
 const createUser = async(req, res, next) => {
@@ -98,4 +142,6 @@ module.exports = {
     getAllUsers,
     getOneUser,
     updateUser,
+    checkLoginBody,
+    loginUser,
 };

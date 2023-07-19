@@ -9,6 +9,7 @@ app.get("/", main.welcomeMessage);
 
 app.post("/users", auth.checkSignupBody, auth.createUser);
 app.get("/users", auth.isValidUser, auth.getAllUsers);
+app.post("/login", auth.checkLoginBody, auth.loginUser);
 app.get("/user/:id", auth.getOneUser);
 app.put("/user/:id", auth.updateUser);
 
