@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` });
 const pool = require("../db/config");
 const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
