@@ -10,7 +10,7 @@ app.get("/", main.welcomeMessage);
 app.post("/users/signup", auth.checkSignupBody, auth.signupUser)
 app.post("/users/login", auth.checkLoginBody, auth.loginUser)
 
-app.get("/users", auth.isValidUser, auth.getAllUsers);
+app.get("/users", auth.isAdminUser, auth.getAllUsers);
 app.get("/user/:id", auth.getOneUser);
 app.put("/user/:id", auth.updateUser);
 

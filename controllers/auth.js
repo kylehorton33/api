@@ -15,10 +15,26 @@ const isValidUser = (req, res, next) => {
     try {
         token = req.headers.authorization.split(' ')[1];
         decoded = jwt.verify(token, process.env.JWT_SECRET)
-        console.log(new Date().getTime() - decoded.iat) // check age of token
-        next()
     } catch {
         return res.status(401).send({ error: "You must be logged in for this action " })
+    }
+    console.log(new Date().getTime() - decoded.iat) // check age of token
+    next()
+}
+
+const isAdminUser = (req, res, next) => {
+    let token, decoded;
+    try {
+        token = req.headers.authorization.split(' ')[1];
+        decoded = jwt.verify(token, process.env.JWT_SECRET)
+    } catch {
+        return res.status(401).send({ error: "You must be logged in for this action " })
+    }
+    console.log(new Date().getTime() - decoded.iat) // check age of token
+    if (decoded.admintype) {
+        next()
+    } else {
+        return res.status(401).send({ error: "You must be an admin for this action " })
     }
 }
 
@@ -137,6 +153,7 @@ const updateUser = async(req, res) => {
 module.exports = {
     checkSignupBody,
     isValidUser,
+    isAdminUser,
     signupUser,
     getAllUsers,
     getOneUser,
