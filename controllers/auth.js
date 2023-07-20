@@ -15,7 +15,7 @@ const isValidUser = (req, res, next) => {
     try {
         token = req.headers.authorization.split(' ')[1];
         decoded = jwt.verify(token, process.env.JWT_SECRET)
-        console.log(decoded)
+        console.log(new Date().getTime() - decoded.iat) // check age of token
         next()
     } catch {
         return res.status(401).send({ error: "You must be logged in for this action " })
