@@ -1,7 +1,7 @@
 {
     "name": "api",
-    "version": "1.0.0",
-    "description": "",
+    "version": "0.1.0",
+    "description": "API with signup/login functionality",
     "main": "index.js",
     "scripts": {
         "dev": "NODE_ENV=development nodemon index.js",
