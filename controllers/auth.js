@@ -31,7 +31,7 @@ const isAdminUser = (req, res, next) => {
         return res.status(401).send({ error: "You must be logged in for this action " })
     }
     console.log(new Date().getTime() - decoded.iat) // check age of token
-    if (decoded.admintype) {
+    if (decoded.is_admin) {
         next()
     } else {
         return res.status(401).send({ error: "You must be an admin for this action " })
@@ -129,7 +129,7 @@ const signupUser = async(req, res, next) => {
 
 // return all users
 const getAllUsers = async(req, res) => {
-    const users = await pool.query("SELECT user_id, email, username, usertype, admintype FROM users");
+    const users = await pool.query("SELECT user_id, email, is_admin, is_verified FROM app_user");
     res.json(users.rows);
 };
 
