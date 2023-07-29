@@ -48,7 +48,7 @@ const checkSignupBody = [
 ];
 
 const checkLoginBody = [
-    body("username")
+    body("email")
     .not().isEmpty(),
     body("password")
     .not().isEmpty()
@@ -65,13 +65,13 @@ const loginUser = async(req, res, next) => {
     // validate request body
     validateRequestBody(req, res)
 
-    const username = req.body.username;
+    const email = req.body.email;
     const password = req.body.password;
 
     // check if user exists
     let user = null;
     try {
-        result = await pool.query("SELECT user_id, password_hash, admintype, usertype FROM users WHERE username = $1", [username]);
+        result = await pool.query("SELECT user_id, password_hash, is_admin FROM app_user WHERE email = $1", [email]);
         user = result.rows[0]
     } catch (err) {
         return res.status(500).json({ "error": err.message });
