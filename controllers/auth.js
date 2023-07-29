@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 function createUserToken(user) {
     const timestamp = new Date().getTime();
-    const payload = { sub: user.user_id, iat: timestamp, admintype: user.admintype, usertype: user.usertype };
+    const payload = { sub: user.user_id, iat: timestamp, is_admin: user.is_admin };
     return jwt.sign(payload, process.env.JWT_SECRET);
 }
 
@@ -41,10 +41,6 @@ const isAdminUser = (req, res, next) => {
 const checkSignupBody = [
     body("email")
     .isEmail().normalizeEmail({ all_lowercase: true }),
-    body("username")
-    .not().isEmpty()
-    .trim().escape()
-    .isLength({ min: 3, max: 15 }),
     body("password")
     .not().isEmpty()
     .trim().escape()
@@ -102,30 +98,27 @@ const signupUser = async(req, res, next) => {
     }
 
     const email = req.body.email;
-    const username = req.body.username;
     const password = req.body.password;
-    const userType = 1;
-    const adminType = 0;
 
     // Check if a user with the username or email already exists
     let existingUser = null;
     try {
-        existingUser = await pool.query("SELECT * FROM users WHERE username = $1 or email = $2", [username, email]);
+        existingUser = await pool.query("SELECT * FROM app_user WHERE email = $1", [email]);
     } catch (err) {
         return res.status(500).json({ "error": err.message });
     }
 
     // If the user already exists, then return an error.
     if (existingUser.rows[0]) {
-        return res.status(422).send({ error: 'This username or email is already taken. Please check and try again.' });
+        return res.status(422).send({ error: 'This email is already taken. Please check and try again.' });
     }
 
-    // If a user with username does NOT exist, create and save user record
+    // If a user with email does NOT exist, create and save user record
     let newUser = null;
     let hashedPassword = null;
     try {
         hashedPassword = await bcrypt.hash(password, 10).then(hash => { return hash })
-        newUser = await pool.query("INSERT INTO users (email, username, password_hash, usertype, admintype) VALUES ($1, $2, $3, $4, $5) RETURNING *", [email, username, hashedPassword, userType, adminType]);
+        newUser = await pool.query("INSERT INTO app_user (email, password_hash) VALUES ($1, $2) RETURNING *", [email, hashedPassword]);
     } catch (err) {
         return res.status(500).send({ error: err.message });
     }
