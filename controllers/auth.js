@@ -65,9 +65,9 @@ const loginUser = async(req, res, next) => {
     // validate request body
     validateRequestBody(req, res)
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Aceess-Control-Allow-Headers", "*");
-    res.setHeader("Aceess-Control-Allow-Methods", "*");
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Aceess-Control-Allow-Headers", "*");
+    res.set("Aceess-Control-Allow-Methods", "*");
 
     const email = req.body.email;
     const password = req.body.password;
