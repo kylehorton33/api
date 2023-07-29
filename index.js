@@ -5,8 +5,7 @@ const auth = require("./controllers/auth");
 
 const app = express();
 app.use(express.json());
-
-app.options('*', cors());
+app.use(cors({ origin: "*" }));
 
 app.get("/", main.welcomeMessage);
 
